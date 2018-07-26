@@ -1,16 +1,63 @@
-window.logStack = (function() {
-  window.addEventListener("error", onUncaughtError);
+window.logStack = function() {
+  const LOGSTACK_BASE_URL = "http://localhost:8080/api";
+  const LOGSTACK_API_VERSION = "v1";
+  const LOGSTACK_ENDPOINT = "issues";
+  const START_TIME = Date.now();
+
+  let breadcrumbs = [];
+
+  let config = {
+    projectId: null,
+    context: {},
+    user: {},
+    tags: {},
+  };
+  function init(params) {
+    config = params;
+    window.addEventListener("error", onUncaughtError);
+    window.addEventListener("click", onClick);
+
+    xhook.before(function(request) {
+      let data = {
+        type: "request",
+        url: request.url,
+        method: request.method,
+      };
+      addBreadcrumb(data);
+    });
+  }
+
+  function printConfig() {
+    console.log(config);
+  }
 
   function report(params) {
+    makeCall(params);
+  }
 
+  function setUser(params) {
+    for (let prop in params) {
+      config.user[prop] = params[prop];
+    }
+  }
+
+  function setContext(params) {
+    for (let prop in params) {
+      config.context[prop] = params[prop];
+    }
+  }
+  function setTags(params) {
+    for (let prop in params) {
+      config.tags[prop] = params[prop];
+    }
   }
 
   function getNavigatorProps() {
     let navigatorData = {};
     for (let prop in window.navigator) {
-      if(
-        typeof (window.navigator[prop]) !== "object" &&
-        typeof (window.navigator[prop]) !== "function"
+      if (
+        typeof window.navigator[prop] !== "object" &&
+        typeof window.navigator[prop] !== "function"
       ) {
         navigatorData[prop] = window.navigator[prop];
       }
@@ -20,8 +67,6 @@ window.logStack = (function() {
   }
 
   function onUncaughtError(event) {
-    console.warn(event);
-    console.warn(event.stack);
     let stack;
 
     if (event.error && event.error.stack) {
@@ -37,27 +82,54 @@ window.logStack = (function() {
       stack: stack,
     };
 
-    console.log("to report:");
-    console.log(errorJSON);
-
     makeCall(errorData);
   }
 
-  function makeCall(data) {
-    const LOGSTACK_BASE_URL = "http://localhost:8080/api";
-    const LOGSTACK_API_VERSION = "v1";
-    const LOGSTACK_ENDPOINT = "issues"
+  function makeCall(params) {
+    params.navigator = getNavigatorProps();
+    for (let prop in config) {
+      params[prop] = config[prop];
+    }
 
-    data.navigator = getNavigatorProps();
+    let crtTime = Date.now();
+
+    if (!params.timeStamp) {
+      params.timeStamp = crtTime - START_TIME;
+    }
+
+    params.breadcrumbs = breadcrumbs;
 
     axios({
       method: "POST",
       url: `${LOGSTACK_BASE_URL}/${LOGSTACK_API_VERSION}/${LOGSTACK_ENDPOINT}/`,
-      data: data,
+      data: params,
     });
   }
 
-  return {
-    report: report,
+  function addBreadcrumb(breadcrumbData) {
+    breadcrumbs.push(breadcrumbData);
   }
-})();
+
+  function onClick(e) {
+    let data = {
+      type: "click",
+      target: {
+        tag: event.target.tagName,
+        content: event.target.textContent.split(0, 50),
+        id: event.target.id,
+        classList: event.target.classList,
+      },
+    };
+    addBreadcrumb(data);
+  }
+
+  return {
+    init: init,
+    report: report,
+    addBreadcrumb: addBreadcrumb,
+    printConfig: printConfig,
+    setContext: setContext,
+    setUser: setUser,
+    setTags: setTags,
+  };
+};
