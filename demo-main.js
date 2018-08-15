@@ -1,6 +1,6 @@
 var logStack = window.logStack();
 logStack.init({
-  projectId: 123,
+  projectID: "5b71e99b9724ed0607d89bb5",
   context: {
     page: "Main Page",
   },
@@ -17,9 +17,34 @@ document.querySelector("#button-error").addEventListener("click", function(e) {
 document.querySelector("#button-manual").addEventListener("click", function(e) {
   logStack.report({
     type: "message",
-    message: "This is supposed to get to logStack",
+    message: "Stuff",
   });
 });
+document
+  .querySelector("#button-manual-100")
+  .addEventListener("click", function(e) {
+    for (let i = 0; i < 100; i++) {
+      setTimeout(function() {
+        logStack.report({
+          type: "message",
+          message: "Manual message logged",
+        });
+      }, i * 70);
+    }
+  });
+
+document
+  .querySelector("#button-manual-1k")
+  .addEventListener("click", function(e) {
+    for (let i = 0; i < 1000; i++) {
+      setTimeout(function() {
+        logStack.report({
+          type: "message",
+          message: "Manual message logged",
+        });
+      }, i * 70);
+    }
+  });
 
 document
   .querySelector("#button-print-config")
