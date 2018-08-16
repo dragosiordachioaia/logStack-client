@@ -17,14 +17,15 @@ window.logStack = function() {
     window.addEventListener("error", onUncaughtError);
     window.addEventListener("click", onClick);
 
-    xhook.before(function(request) {
-      let data = {
-        type: "request",
-        url: request.url,
-        method: request.method,
-      };
-      addBreadcrumb(data);
-    });
+    // TODO: un-comment this to re-enable http request breadcrumbs
+    // xhook.before(function(request) {
+    //   let data = {
+    //     type: "request",
+    //     url: request.url,
+    //     method: request.method,
+    //   };
+    //   addBreadcrumb(data);
+    // });
   }
 
   function printConfig() {

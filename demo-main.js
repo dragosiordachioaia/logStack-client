@@ -10,14 +10,19 @@ logStack.init({
 });
 console.log("client:", logStack);
 
+function getIssueMessage() {
+  var inputValue = document.querySelector('#error-message').value;
+  return inputValue;
+}
+
 document.querySelector("#button-error").addEventListener("click", function(e) {
-  throw new Error("This is supposed to crash");
+  throw new Error(getIssueMessage());
 });
 
 document.querySelector("#button-manual").addEventListener("click", function(e) {
   logStack.report({
     type: "message",
-    message: "Stuff",
+    message: getIssueMessage(),
   });
 });
 document
@@ -27,7 +32,7 @@ document
       setTimeout(function() {
         logStack.report({
           type: "message",
-          message: "Manual message logged",
+          message: getIssueMessage(),
         });
       }, i * 70);
     }
@@ -40,7 +45,7 @@ document
       setTimeout(function() {
         logStack.report({
           type: "message",
-          message: "Manual message logged",
+          message: getIssueMessage(),
         });
       }, i * 70);
     }
