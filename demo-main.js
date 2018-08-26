@@ -1,6 +1,7 @@
 var logStack = window.logStack();
 logStack.init({
-  projectID: "5b71e99b9724ed0607d89bb5",
+  // projectID: "5b71e99b9724ed0607d89bb5",
+  projectID: "5b7dc08189f8c3006cc31b63",
   context: {
     page: "Main Page",
   },
@@ -11,7 +12,7 @@ logStack.init({
 console.log("client:", logStack);
 
 function getIssueMessage() {
-  var inputValue = document.querySelector('#error-message').value;
+  var inputValue = document.querySelector("#error-message").value;
   return inputValue;
 }
 

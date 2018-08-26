@@ -1,7 +1,6 @@
 window.logStack = function() {
   const LOGSTACK_BASE_URL = "http://localhost:5555/api";
   const LOGSTACK_API_VERSION = "v1";
-  const LOGSTACK_ENDPOINT = "issues";
   const START_TIME = Date.now();
 
   let breadcrumbs = [];
@@ -87,7 +86,8 @@ window.logStack = function() {
   }
 
   function makeCall(params) {
-    params.navigator = getNavigatorProps();
+    // params.navigator = getNavigatorProps();
+    params.userAgent = window.navigator.userAgent;
     for (let prop in config) {
       params[prop] = config[prop];
     }
@@ -103,7 +103,9 @@ window.logStack = function() {
 
     axios({
       method: "POST",
-      url: `${LOGSTACK_BASE_URL}/${LOGSTACK_API_VERSION}/${LOGSTACK_ENDPOINT}/`,
+      url: `${LOGSTACK_BASE_URL}/${LOGSTACK_API_VERSION}/projects/${
+        config.projectID
+      }/issues`,
       data: params,
       // headers: {
       //   "Content-Type": "text/plain",
